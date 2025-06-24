@@ -4,11 +4,15 @@ This game helped me learn the basics of **Linux** and **Git** commands.
 
 ## What I learned in levels 0-10:
 
----
-
 ## SSH Connections
 
 Using SSH to connect to each level's machine is essential. The `-p` option specifies a port, while the `-i` option allows authentication with a private key file. Understanding these options makes connecting to remote systems more flexible and secure.
+
+```bash
+ssh -p 2220 -i key bandit0@bandit.labs.overthewire.org
+```
+
+Make sure the `key` file has the correct permissions (e.g., `chmod 600 key`) before connecting.
 
 ---
 
@@ -159,3 +163,6 @@ echo 'hello world' | tr 'N-ZA-Mn-za-m' 'A-Za-z'
 ```
 
 This approach allows for quick and easy letter substitution directly from the command line, without the need for external tools or websites. The `tr` command is a powerful utility for simple text transformations in Linux.
+
+
+
