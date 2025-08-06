@@ -92,3 +92,48 @@ External personnel may require access to a system for a specific project or dura
 | `w` | Shows who is logged in and what they are doing, including session duration |
 
 ---
+
+
+## Day 3: Secure Root SSH Access
+
+Following security audits, the xFusionCorp Industries security team has rolled out new protocols, including the restriction of direct root SSH login. Your task is to disable direct SSH root login on all app servers within the Stratos Datacenter.
+
+### First of all why do we need to disable direct SSH root login?  
+- If someone is able to find the root password or key via SSH, then they will have complete control over the system;
+- If all operators log in as root at the same time, we won't be able to tell who did what :/
+
+```bash
+sudo vi /etc/ssh/sshd_config
+    PermitRootLogin no
+sudo systemctl restart sshd
+```
+
+> **Note:** Before disabling **root login**, we have to ensure that **we have at least one non-root user with sudo privileges configured** to access the server and perform administrative tasks!
+
+### Main options in sshd_config file:
+
+- **PasswordAuthentication** – Enables or disables SSH logins using passwords.
+- **PermitRootLogin** – Controls whether the root user can log in via SSH.
+- **PermitEmptyPasswords** – If set to **yes**, allows accounts with no password to log in (**unsafe!!**)
+- **AllowUsers** or **DenyUsers** – Allow or deny specific users from logging in via SSH
+- **AuthorizedKeysFile** – Specifies where to find a user’s public keys (default is .ssh/authorized_keys)
+- **ChallengeResponseAuthentication** – For two-factor or challenge-based login
+
+### Difference between sshd_config, sshd_config.d/, ssh_config, and ssh_config.d/
+
+- `/etc/ssh/sshd_config` is the main configuration file for the SSH server.
+- `/etc/ssh/sshd_config.d/` is a directory for additional config files - anything placed here overrides the main sshd_config settings if there’s a conflict.
+
+`/etc/ssh/ssh_config` and `/etc/ssh/ssh_config.d/` are for the SSH client - they control how our system behaves when connecting to other servers, not how our server accepts connections.
+
+### Conflicting PasswordAuthentication settings
+
+If we have two files like:
+
+- `50-cloud-init.conf` with `PasswordAuthentication yes`
+- `60-cloudimg-settings.conf` with `PasswordAuthentication no`
+
+Then **second one** wins, because files inside sshd_config.d/ are loaded in **alphabetical order**, and **later files override earlier ones**.  
+So in this case, `PasswordAuthentication no` is the one that takes effect — password-based logins are disabled.
+
+---
