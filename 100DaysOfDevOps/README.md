@@ -108,9 +108,10 @@ sudo systemctl restart sshd
 > **Note:** Before disabling **root login**, we have to ensure that **we have at least one non-root user with sudo privileges configured** to access the server and perform administrative tasks!
 
 ### First of all why do we need to disable direct SSH root login? 💡
+```diff
 - <span style="color: #AB0007;">If someone is able to find the root password or key via SSH, then they will have complete control over the system;</span>
 - <span style="color: #AB0007;">If all operators log in as root at the same time, we won't be able to tell who did what :/</span>
-
+```diff
 ### Main options in sshd_config file:
 
 - <font color="teal">PasswordAuthentication</font> – Enables or disables SSH logins using passwords.
