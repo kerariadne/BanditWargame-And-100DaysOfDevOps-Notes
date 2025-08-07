@@ -139,3 +139,11 @@ Then **second one** wins, because files inside sshd_config.d/ are loaded in **al
 So in this case, <span style="color: #2E8B57;">`PasswordAuthentication no` is the one that takes effect — password-based logins are disabled.</span>
 
 ---
+
+## Day 4: Linux File Permissions
+
+Your task is to grant executable permissions to the `/tmp/xfusioncorp.sh` script on App Server 2. Additionally, ensure that all users have the capability to execute it.
+
+```bash
+sudo chmod a+x /tmp/xfusioncorp.sh
+```
