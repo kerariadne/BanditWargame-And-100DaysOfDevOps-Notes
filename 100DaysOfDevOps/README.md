@@ -147,3 +147,33 @@ Your task is to grant executable permissions to the `/tmp/xfusioncorp.sh` script
 ```bash
 sudo chmod a+x /tmp/xfusioncorp.sh
 ```
+
+---
+## Day 5: SELinux Package Installation & Temporary Disable
+
+### Task Overview
+
+- **Install required SELinux packages.**
+- **Permanently disable SELinux (to be re-enabled after configuration changes).**
+- **No reboot needed now; maintenance reboot is scheduled for tonight.**
+- **Ignore current SELinux status via CLI; after reboot, SELinux should be disabled.**
+
+### Commands
+
+```bash
+# Install SELinux and related utilities
+sudo yum -y install selinux* policycoreutils libselinux-utils setroubleshoot-server setools setools-console mcstrans
+
+# Permanently disable SELinux
+sudo sed -i 's/SELINUX=enforcing/SELINUX=disabled/g' /etc/sysconfig/selinux
+
+# Verify SELINUX setting in config file
+cat /etc/sysconfig/selinux | grep SELINUX
+
+# Check current SELinux status (will be disabled after reboot)
+sudo sestatus
+sudo getenforce
+
+# Temporarily set SELinux to permissive mode (until reboot)
+sudo setenforce 0
+```
