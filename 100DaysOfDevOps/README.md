@@ -177,3 +177,51 @@ sudo getenforce
 # Temporarily set SELinux to permissive mode (until reboot)
 sudo setenforce 0
 ```
+---
+
+Day 6: Create a Cron Job
+
+- Install cronie package on all Nautilus app servers and start crond service
+- Add a cron job `*/5 * * * * echo hello > /tmp/cron_text` for root user
+
+```bash
+# 1. Install cronie (for CentOS/RHEL)
+sudo yum install -y cronie
+
+# 2. Enable crond service to start at boot
+sudo systemctl enable crond
+
+# 3. Start crond service immediately
+sudo systemctl start crond
+
+# 4. Check status (optional, just to confirm)
+sudo systemctl status crond
+
+# 5. Edit root's crontab
+sudo crontab -e
+
+# 6. Add this line to the crontab:
+*/5 * * * * echo hello > /tmp/cron_text
+
+# 7. Verify cron job was added
+sudo crontab -l
+```
+
+### Cron Schedule Examples Reference:
+
+| Description | Cron Expression | Frequency |
+|-------------|----------------|-----------|
+| Run a script every minute | `* * * * *` | Every minute |
+| Run at 15th minute of every hour | `15 * * * *` | Hourly at :15 |
+| Run at 3 AM every day | `0 3 * * *` | Daily at 3:00 AM |
+| Run on 10th of every month at midnight | `0 0 10 * *` | Monthly on 10th |
+| Run every January 1st at midnight | `0 0 1 1 *` | Yearly on Jan 1st |
+| Run at 8 AM every Monday | `0 8 * * 1` | Weekly on Monday |
+| Run every 5 minutes | `*/5 * * * *` | Every 5 minutes |
+| Run every 5 hours | `0 */5 * * *` | Every 5 hours |
+| Run at 12:30 PM daily | `30 12 * * *` | Daily at 12:30 PM |
+| Run weekdays at 9 AM | `0 9 * * 1-5` | Monday-Friday |
+| Run first 10 minutes of each hour | `0-10 * * * *` | Minutes 0-10 |
+| Run every 2 hours on 1st & 15th | `0 */2 1,15 * *` | Bi-monthly |
+| Run every 10 min on Sundays in Dec | `*/10 * * 12 0` | December Sundays |
+| Run at 6:45 PM on Fridays | `45 18 * * 5` | Friday evenings |
