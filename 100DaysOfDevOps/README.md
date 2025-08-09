@@ -179,7 +179,7 @@ sudo setenforce 0
 ```
 ---
 
-Day 6: Create a Cron Job
+## Day 6: Create a Cron Job
 
 - Install cronie package on all Nautilus app servers and start crond service
 - Add a cron job `*/5 * * * * echo hello > /tmp/cron_text` for root user
