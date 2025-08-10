@@ -225,3 +225,54 @@ sudo crontab -l
 | Run every 2 hours on 1st & 15th | `0 */2 1,15 * *` | Bi-monthly |
 | Run every 10 min on Sundays in Dec | `*/10 * * 12 0` | December Sundays |
 | Run at 6:45 PM on Fridays | `45 18 * * 5` | Friday evenings |
+
+---
+
+## Day 7: Linux SSH Authentication
+
+The system admins team of xFusionCorp Industries has set up some scripts on jump host that run on regular intervals and perform operations on all app servers in Stratos Datacenter. To make these scripts work properly we need to make sure the `thor` user on jump host has password-less SSH access to all app servers through their respective sudo users. Set up password-less authentication from user `thor` on jump host to all app servers through their respective sudo users.
+
+### How SSH Key Authentication Works 🔐
+
+Password-less authentication in SSH works by using key pairs instead of passwords:
+
+1. **Private key** stays on the jump host in thor's home directory — it's like your personal "secret signature"
+2. **Public key** gets copied to the target server's `~/.ssh/authorized_keys` file for the sudo user (like tony)
+3. When thor connects, SSH uses the private key to prove identity, and the target server checks the matching public key — no password prompt needed
+
+### Why Generate SSH Keys?
+
+If we skip key generation:
+- ❌ we won't have a key pair for thor
+- ❌ `ssh-copy-id` won't have a public key to install on the app servers
+- ❌ SSH will still fall back to asking for a password
+- ✅ It's basically creating the "digital handshake" so thor can log in automatically
+
+### Step-by-Step Commands:
+
+```bash
+# 1. Generate SSH key pair on jump host (as thor user)
+ssh-keygen -t rsa
+
+# This will create:
+# Public key: ~/.ssh/id_rsa.pub
+# Private key: ~/.ssh/id_rsa
+
+# 2. Copy the public key to each app server's sudo user
+ssh-copy-id tony@stapp01
+ssh-copy-id steve@stapp02
+ssh-copy-id banner@stapp03
+
+# 3. Verify password-less login works
+ssh tony@stapp01 "hostname"
+ssh steve@stapp02 "hostname"
+ssh banner@stapp03 "hostname"
+```
+
+### Key Files Created:
+
+| File | Location | Purpose |
+|------|----------|---------|
+| `id_rsa` | `~/.ssh/id_rsa` | **Private Key** (Keep secret!) |
+| `id_rsa.pub` | `~/.ssh/id_rsa.pub` | **Public Key** (Safe to share) |
+| `authorized_keys` | Remote: `~/.ssh/authorized_keys` | Contains public keys for authentication |
