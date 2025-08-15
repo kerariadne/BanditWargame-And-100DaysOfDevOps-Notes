@@ -276,3 +276,135 @@ ssh banner@stapp03 "hostname"
 | `id_rsa` | `~/.ssh/id_rsa` | **Private Key** (Keep secret!) |
 | `id_rsa.pub` | `~/.ssh/id_rsa.pub` | **Public Key** (Safe to share) |
 | `authorized_keys` | Remote: `~/.ssh/authorized_keys` | Contains public keys for authentication |
+
+---
+
+## Day 8: Install Ansible
+
+Install Ansible v4.8.0 on the jump host using pip3 and make sure it's available for all users.
+
+### Installation Steps:
+
+```bash
+# Check OS version
+cat /etc/*release
+
+# Check if Python 3 is installed
+python3 --version
+
+# Check if pip3 is installed
+pip3 --version
+
+# Install Ansible using pip3
+sudo pip3 install ansible==4.10.0
+
+# Verify installation
+ansible --version
+
+# Check if it is available to all user (it should be located in /usr/local/bin)
+which ansible
+
+```
+
+---
+
+Day 8: Install Ansible
+
+Install Ansible v4.8.0 on the jump host using pip3 and make sure it’s available for all users.
+
+
+
+cat /etc/*release # to check OS
+python3 --version #Check if Python 3 is installed
+pip3 --version # to check if pip3 is installed
+sudo pip3 install ansible==4.10.0
+
+ansible --version
+
+“core 2.11.12.” . This is because Ansible’s version command shows the core engine version, not the full package version. To check the full release, I had to run pip3 show ansible.
+
+Since Ansible was installed with sudo pip3, It should be in /usr/local/bin and available to all users.
+I checked with the command which ansible to confirm
+
+---
+
+## Day 9: MariaDB Troubleshooting
+
+### Problem Statement
+
+There is a critical issue going on with the Nautilus application in Stratos DC. The production support team identified that the application is unable to connect to the database. After digging into the issue, the team found that **MariaDB service is down** on the database server.
+
+**Task:** Look into the issue and fix the same.
+
+### Troubleshooting Steps & Analysis
+
+#### 1. Check Service Status
+
+```bash
+systemctl status mariadb.service
+```
+
+**Output:**
+```
+○ mariadb.service - MariaDB 10.5 database server
+     Loaded: loaded (/usr/lib/systemd/system/mariadb.service; enabled; preset: disabled)
+     Active: inactive (dead) since Fri 2025-08-15 15:37:29 UTC; 9min ago
+```
+
+#### 2. Check MariaDB Logs
+
+```bash
+sudo cat /var/log/mariadb/mariadb.log
+```
+
+**Error Found:**
+```
+2025-08-15 15:53:22 0 [ERROR] mariadbd: Can't create/write to file '/run/mariadb/mariadb.pid' (Errcode: 13 "Permission denied")
+2025-08-15 15:53:22 0 [ERROR] Can't start server: can't create PID file: Permission denied
+```
+
+#### 3. Investigate Directory Permissions
+
+```bash
+ls -ld /run/mariadb/
+```
+
+**Initial Output:**
+```
+drwxr-xr-x  2 root mysql    40 Aug 15 15:37 mariadb
+```
+
+**Root Cause:** The `/run/mariadb/` directory was owned by `root:mysql` instead of `mysql:mysql`, causing permission issues when MariaDB tried to create its PID file.
+
+### Solution & Fix
+
+#### 4. Fix Directory Ownership
+
+```bash
+sudo chown mysql:mysql /run/mariadb/
+```
+
+#### 5. Verify Ownership Change
+
+```bash
+ls -ld /run/mariadb/
+```
+
+**After Fix:**
+```
+drwxr-xr-x 2 mysql mysql 60 Aug 15 15:56 /run/mariadb/
+```
+
+#### 6. Start MariaDB Service
+
+```bash
+sudo systemctl start mariadb.service
+```
+
+#### 7. Verify Service is Running
+
+```bash
+sudo systemctl status mariadb.service
+```
+
+---
