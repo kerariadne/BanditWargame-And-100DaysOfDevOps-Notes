@@ -408,3 +408,50 @@ sudo systemctl status mariadb.service
 ```
 
 ---
+
+---
+
+## Day 10: Bash Script for Website Backup
+
+### Task: Create Backup Script for Static Website
+
+Create a bash script for taking websites backup. They have a static website running on App Server 3 in Stratos Datacenter, and they need to create a bash script named `blog_backup.sh` which should accomplish the following tasks. (Also remember to place the script under `/scripts` directory on App Server 3).
+
+**Requirements:**
+- a. Create a zip archive named `xfusioncorp_blog.zip` of `/var/www/html/blog` directory
+- b. Save the archive in `/backup/` on App Server 3. This is a temporary storage, as backups from this location will be clean on weekly basis. Therefore, we also need to save this backup archive on Nautilus Backup Server
+- c. Copy the created archive to Nautilus Backup Server server in `/backup/` location
+- d. Please make sure script won't ask for password while copying the archive file. Additionally, the respective server user (for example, tony in case of App Server 1) must be able to run it
+
+### Setup Commands:
+
+```bash
+# Generate SSH key for passwordless authentication
+ssh-keygen -t rsa 
+
+# Copy SSH key to backup server
+ssh-copy-id clint@stbkp01
+
+# Make script executable
+chmod +x /scripts/blog_backup.sh
+```
+
+### Script Content (`/scripts/blog_backup.sh`):
+
+```bash
+#!/bin/bash
+
+# Create zip archive of the blog directory
+zip -r /backup/xfusioncorp_blog.zip /var/www/html/blog
+
+# Copy archive to Nautilus Backup Server
+scp /backup/xfusioncorp_blog.zip clint@stbkp01:/backup/
+```
+
+...
+
+
+
+
+
+
